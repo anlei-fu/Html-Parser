@@ -1,4 +1,17 @@
-  public class Semi_Element : IName
+using Fal.Fal_Exception;
+using Fal.Nlp;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Fal.DataStructure.Tree
+{
+    /****************************************************************
+     *  半元素
+     ******************************************************************/
+    public class Semi_Element : IName
     {
         public Semi_Element()
         { }
@@ -232,7 +245,7 @@
         /// <summary>
         /// 是否具有上一个元素
         /// </summary>
-        public bool HasPrevious=> Previous != null;
+        public bool HasPrevious => Previous != null;
         /// <summary>
         /// 是否具有下一个元素
         /// </summary>
@@ -240,7 +253,7 @@
         /// <summary>
         /// 是否含有子元素
         /// </summary>
-        public bool HasChildren=> Children.Count != 0;
+        public bool HasChildren => Children.Count != 0;
         /// <summary>
         /// 通过index访问子元素
         /// </summary>
@@ -275,7 +288,7 @@
         /// 父元素
         /// </summary>
         public Element Father { get; set; }
-      
+
         /// <summary>
         /// 增加直接子元素
         /// </summary>
@@ -294,8 +307,8 @@
             foreach (var item in input)
                 Add(item);
         }
-        
-       public void Remove(int index)
+
+        public void Remove(int index)
         {
             Exception_Thrower.Checkthrow_OutOfRange(0, Count, index);
             Children.RemoveAt(index);
@@ -307,11 +320,11 @@
         public void Remove(string name)
         {
             for (int i = 0; i < Count; i++)
-            {
                 if (Children[i].Name == name)
+                {
                     Children.RemoveAt(i);
-                i--;
-            }
+                    --i;
+                }
         }
         /// <summary>
         /// 通过元素类型移除直接子元素
@@ -320,11 +333,12 @@
         public void Remove(Element_Type type)
         {
             for (int i = 0; i < Count; i++)
-            {
                 if (Children[i].Element_Type == type)
+                {
                     Children.RemoveAt(i);
-                i--;
-            }
+                    --i;
+                }
+
         }
         /// <summary>
         /// 通过属性项，移除直接子元素
@@ -333,12 +347,13 @@
         public void Remove(Attribute_Item attribute_item)
         {
             for (int i = 0; i < Count; i++)
-            {
                 if (Children[i].Attributes.Contains_Key(attribute_item.Key))
                     if (Children[i].Attributes[attribute_item.Key] == attribute_item.Value)
+                    {
                         Children.RemoveAt(i);
-                i--;
-            }
+                        --i;
+                    }
+
         }
         /// <summary>
         /// 移除直接子元素
@@ -350,15 +365,16 @@
             Exception_Thrower.Checkthrow_OutOfRange(0, Count, start + length);
             Children.RemoveRange(start, length);
         }
-       /// <summary>
-       /// 通过名字移除所有子节点
-       /// </summary>
-       /// <param name="name"></param>
+        /// <summary>
+        /// 通过名字移除所有子节点
+        /// </summary>
+        /// <param name="name"></param>
         public void Remove_All(string name)
         {
             if (Children.Count != 0)
                 foreach (var item in Children)
                     item.Remove_All(name);
+
             Remove(name);
         }
         /// <summary>
@@ -370,6 +386,7 @@
             if (Children.Count != 0)
                 foreach (var item in Children)
                     item.Remove_All(type);
+
             Remove(type);
         }
         /// <summary>
@@ -381,6 +398,7 @@
             if (Children.Count != 0)
                 foreach (var item in Children)
                     item.Remove_All(attribute_item);
+
             Remove(attribute_item);
         }
         /// <summary>
@@ -411,7 +429,8 @@
         {
             var ls = new List<Element>();
             foreach (var item in Children)
-                if (item.Element_Type == type) ls.Add(item);
+                if (item.Element_Type == type)
+                    ls.Add(item);
             return ls;
         }
         /// <summary>
@@ -442,8 +461,10 @@
             var ls = new List<Element>();
             foreach (var item in Children)
             {
-                if (item.Attributes == null) continue;
-                if (item.Attributes.Contains_Key(key)) ls.Add(item);
+                if (item.Attributes == null)
+                    continue;
+                if (item.Attributes.Contains_Key(key))
+                    ls.Add(item);
             }
             return ls;
         }
@@ -455,8 +476,11 @@
         public List<Element> Get_Direct_Children_Name(string name)
         {
             var ls = new List<Element>();
+
             foreach (var item in Children)
-                if (item.Name == name) ls.Add(item);
+                if (item.Name == name)
+                    ls.Add(item);
+
             return ls;
         }
         /// <summary>
@@ -469,8 +493,11 @@
             var ls = new List<Element>();
             if (Children.Count != 0)
                 foreach (var item in Children)
-                    foreach (var item1 in item.Get_All_Children_By_Element_Type(type)) ls.Add(item1);
-            if (Element_Type == type) ls.Add(this);
+                    foreach (var item1 in item.Get_All_Children_By_Element_Type(type))
+                        ls.Add(item1);
+
+            if (Element_Type == type)
+                ls.Add(this);
             return ls;
         }
         /// <summary>
@@ -483,9 +510,14 @@
             var ls = new List<Element>();
             if (Children.Count != 0)
                 foreach (var item in Children)
-                    foreach (var item1 in item.Get_All_Children_By_Attirbute(attribute_item)) ls.Add(item1);
-            if (Attributes == null) return ls;
-            if (Attributes.Get_Attribute(attribute_item) != null) ls.Add(this);
+                    foreach (var item1 in item.Get_All_Children_By_Attirbute(attribute_item))
+                        ls.Add(item1);
+
+            if (Attributes == null)
+                return ls;
+            if (Attributes.Get_Attribute(attribute_item) != null)
+                ls.Add(this);
+
             return ls;
         }
         /// <summary>
@@ -496,11 +528,15 @@
         public List<Element> Get_All_Children_By_Contain_Attirbute_Key(string key)
         {
             var ls = new List<Element>();
+
             if (Children.Count != 0)
                 foreach (var item in Children)
                     foreach (var item1 in item.Get_All_Children_By_Contain_Attirbute_Key(key)) ls.Add(item1);
-            if (Attributes == null) return ls;
-            if (Attributes.Get_Attribute(key) != null) ls.Add(this);
+
+            if (Attributes == null)
+                return ls;
+            if (Attributes.Get_Attribute(key) != null)
+                ls.Add(this);
             return ls;
         }
         /// <summary>
@@ -511,17 +547,21 @@
         public List<Element> Get_All_Children_By_Name(string name)
         {
             var ls = new List<Element>();
+
             if (Children.Count != 0)
                 foreach (var item in Children)
-                    foreach (var item1 in item.Get_All_Children_By_Name(name)) ls.Add(item1);
-            if (Name == name) ls.Add(this);
+                    foreach (var item1 in item.Get_All_Children_By_Name(name))
+                        ls.Add(item1);
+
+            if (Name == name)
+                ls.Add(this);
             return ls;
         }
 
-       /// <summary>
-       /// 重写tostring（），并进行了格式化
-       /// </summary>
-       /// <returns></returns>
+        /// <summary>
+        /// 重写tostring（），并进行了格式化
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             var t = 0;
@@ -552,3 +592,4 @@
             return Position_end.CompareTo(other.Position_end);
         }
     }
+}
