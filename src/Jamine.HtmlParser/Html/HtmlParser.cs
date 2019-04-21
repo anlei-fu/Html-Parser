@@ -466,10 +466,14 @@ namespace Jamine.Parser.Html
         {
             while (hasNext(1))
             {
+                next(1);
+
                 _InnerTextBuilder.Append(_page[_currentIndex]);
 
-                if (next(1) == c && _page[_currentIndex - 1] != '\\')
+                if (_page[_currentIndex] == c && _page[_currentIndex - 1] != '\\')
                     return;
+
+              
             }
         }
         /// <summary>
