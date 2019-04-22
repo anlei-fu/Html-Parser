@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using AngleSharp;
+using HtmlAgilityPack;
 using Jamine.Parser.Html;
 using System;
 using System.Diagnostics;
@@ -10,6 +11,9 @@ namespace ParserTest2
     {
         static void Main(string[] args)
         {
+            var aparser = new AngleSharp.Html.Parser.HtmlParser();
+
+
             var parser = new HtmlParser();
             var psrWatch = new Stopwatch();
 
@@ -24,13 +28,40 @@ namespace ParserTest2
             doc.LoadHtml(page);
             var hapElapsed = hapWatch.ElapsedMilliseconds;
 
+            var aWtach = new Stopwatch();
+            aWtach.Start();
+
+            var adom = aparser.ParseDocument(page);
+            var aElapsed = aWtach.ElapsedMilliseconds;
+
+
+
             Console.WriteLine(root);
+
             Console.WriteLine();
             Console.WriteLine();
+            Console.WriteLine();
+
+            Console.Write(adom);
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+
 
             Console.WriteLine($"Tset parsing speed of youku-home page,  page length : {page.Length}");
             Console.WriteLine($"HtmlAgilityPack Time-Spnd:{hapWatch.Elapsed.Milliseconds}ms");
             Console.WriteLine($"HtmlParser Time-Spend:{htmlParserElapsed}ms");
+            Console.WriteLine($"AngleSharp Time-Spend:{aElapsed}ms");
+
             Console.Read();
         }
     }

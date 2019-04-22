@@ -24,7 +24,7 @@ namespace Jamine.Parser.Html
         private StringBuilder _attributeKeyBuilder = new StringBuilder();
         private StringBuilder _nameBuilder = new StringBuilder();
         private StringBuilder _InnerTextBuilder = new StringBuilder();
-        private StringBuilder _escapePatternBuilder = new StringBuilder();
+        private StringBuilder _escapeStringBuilder = new StringBuilder();
         private StringBuilder _scriptEndPartBuilder = new StringBuilder();
         private bool _hasNameBeenSet;
         private bool _hasAttributeKeyBeenSet;
@@ -132,7 +132,7 @@ namespace Jamine.Parser.Html
 
                             pushIntoStack(_currentElement);
 
-                            // script elments should be treat spicialy ,cause them contains some distraction char 
+                            // script-like elments should be treated spicialy ,cause them contain some distraction char 
                             //such as ,<script> alert("<div></div>") </script>
                             if (_currentElement.StartOrEnd != StartOrEnd.End && _currentElement.SingleOrDouble != SingleOrDouble.Single)
                                 checkAndParseScript();
@@ -224,9 +224,8 @@ namespace Jamine.Parser.Html
 
         }
 
-
         /// <summary>
-        /// to handle some tag such as 
+        /// to handle some tags such as 
         /// <script>
         /// <div></div>
         /// </script>
@@ -272,12 +271,12 @@ namespace Jamine.Parser.Html
                         _InnerTextBuilder.Append(_page[_currentIndex]);
                         skipMatchedPattern('\n');
                     }
-                    //skip js mutiple annotation
+                    //skip js mutiple line annotation
                     else if (_page[_currentIndex] == '*' && _page[_currentIndex - 1] == '/')
                     {
                         skipScriptMutipleLineAnnotation();
                     }
-                    //try check is script end
+                    //try check and finish script tag
                     else if (_page[_currentIndex] == '<' && hasNext(1) && next(1) == '/')
                     {
                         _InnerTextBuilder.Remove(_InnerTextBuilder.Length - 1, 1);
@@ -309,7 +308,7 @@ namespace Jamine.Parser.Html
                                         _currentElement.InnerText = _InnerTextBuilder.ToString();
                                         _InnerTextBuilder.Clear();
 
-                                        //  close end-tag part ,if current char is not '>'
+                                        //  close end-tag part ,if current char is not always '>'
                                         if (_page[_currentIndex] != '>')
                                             while (hasNext(1))
                                             {
@@ -365,7 +364,7 @@ namespace Jamine.Parser.Html
 
             if (element.SingleOrDouble == SingleOrDouble.Single)//
             {
-                // single element can not be  a root
+                // single element can not be  a root element
                 //
                 if (_stack.Count > 0)
                 {
@@ -381,7 +380,7 @@ namespace Jamine.Parser.Html
                 }
                 else
                 {
-                    recordError($"empty stack and push into a single element :{element.Name}!");
+                    recordError($"empty stack can not push into a single element :{element.Name} !");
                 }
             }
             else
@@ -409,7 +408,8 @@ namespace Jamine.Parser.Html
                         //is the same type element
                         if (element.Name == peek.Name)
                         {
-                            //meas  after poping root will be clear
+                            //means  after poping root will be clear
+                            // it's a syntax error ,but i choose to ignore
                             if (_stack.Count == 1)
                             {
                                 recordError($" set root {peek.Name}");
@@ -437,7 +437,7 @@ namespace Jamine.Parser.Html
                     }
                     else
                     {
-                        recordError($"empty stack and push into a single element :{element.Name}!");
+                        recordError($"empty stack can not push into a single element :{element.Name} !");
                     }
                 }
             }
@@ -473,7 +473,6 @@ namespace Jamine.Parser.Html
                 if (_page[_currentIndex] == c && _page[_currentIndex - 1] != '\\')
                     return;
 
-              
             }
         }
         /// <summary>
@@ -521,7 +520,7 @@ namespace Jamine.Parser.Html
                                 // not match , do nothing ,and  nothing  left to parse
                             }
                         }
-                        else//may be doctype
+                        else//may be <!doctype>
                         {
                             while (hasNext(1))
                             {
@@ -565,12 +564,11 @@ namespace Jamine.Parser.Html
 
                 switch (_page[_currentIndex])
                 {
-                    //parse html escape pattern
+                    //parse html escape string
                     // pattern start with '&' , end with ';' ,and lenth should less than 4
                     case '&':
-                        _escapePatternBuilder.Append('&');
 
-
+                        _escapeStringBuilder.Append('&');
 
                         var i = 0;//record escape string length
 
@@ -578,8 +576,8 @@ namespace Jamine.Parser.Html
                         {
                             if (i > 4)//over max length
                             {
-                                _InnerTextBuilder.Append(_escapePatternBuilder.ToString());
-                                _escapePatternBuilder.Clear();
+                                _InnerTextBuilder.Append(_escapeStringBuilder.ToString());
+                                _escapeStringBuilder.Clear();
 
                                 break;
                             }
@@ -589,30 +587,30 @@ namespace Jamine.Parser.Html
                             //innertext end break token
                             if (_page[_currentIndex] == '<')
                             {
-                                _InnerTextBuilder.Append(_escapePatternBuilder.ToString());
-                                _escapePatternBuilder.Clear();
+                                _InnerTextBuilder.Append(_escapeStringBuilder.ToString());
+                                _escapeStringBuilder.Clear();
                                 previous(1);
 
                                 break;
                             }
 
-                            _escapePatternBuilder.Append(_page[_currentIndex]);
+                            _escapeStringBuilder.Append(_page[_currentIndex]);
 
                             //escape string end token
                             if (_page[_currentIndex] == ';')
                             {
                                 //can replace pattern
-                                if (HtmlEscapeStringMapper.Contains(_escapePatternBuilder.ToString()))
+                                if (HtmlEscapeStringMapper.Contains(_escapeStringBuilder.ToString()))
                                 {
-                                    _InnerTextBuilder.Append(HtmlEscapeStringMapper.Replace(_escapePatternBuilder.ToString()));
+                                    _InnerTextBuilder.Append(HtmlEscapeStringMapper.Replace(_escapeStringBuilder.ToString()));
                                 }
                                 else
                                 {
-                                    _InnerTextBuilder.Append(_escapePatternBuilder.ToString());
-                                    recordError($" unknow escape string ：{_escapePatternBuilder.ToString()}");
+                                    _InnerTextBuilder.Append(_escapeStringBuilder.ToString());
+                                    recordError($" unknow escape string ：{_escapeStringBuilder.ToString()}");
                                 }
 
-                                _escapePatternBuilder.Clear();
+                                _escapeStringBuilder.Clear();
 
                                 break;
                             }
@@ -707,6 +705,10 @@ namespace Jamine.Parser.Html
         {
             _logger?.Info(msg);
         }
+        /// <summary>
+        ///  has syntax error ,pop stack to empty ,and the root is stack's bottom 
+        /// </summary>
+        /// <returns></returns>
         private Element getRoot()
         {
             if (_root != null)
