@@ -1,7 +1,7 @@
 # Html-Parser
 Parse  html page in c# language
 ##### Provide normal element operation of html dom tree
-##### High speed ,almost 150,000,000 char per second
+##### High speed ,almost 150,000,000 chars per second
 ##### A base component  of a net spider system
 
 
