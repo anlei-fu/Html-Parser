@@ -53,12 +53,12 @@ namespace ParserTest2
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
 
 
+            Console.WriteLine("**************************************************");
+            Console.WriteLine("**************************************************");
             Console.WriteLine($"Tset parsing speed of youku-home page,  page length : {page.Length}");
-            Console.WriteLine($"HtmlAgilityPack Time-Spnd:{hapWatch.Elapsed.Milliseconds}ms");
+            Console.WriteLine($"HtmlAgilityPack Time-Spend:{hapWatch.Elapsed.Milliseconds}ms");
             Console.WriteLine($"HtmlParser Time-Spend:{htmlParserElapsed}ms");
             Console.WriteLine($"AngleSharp Time-Spend:{aElapsed}ms");
 
